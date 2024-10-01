@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Standort Abfrage</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #location {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Standort Abfrage</h1>
+    <p id="location">Standort wird abgerufen...</p>
+
+    <script>
+        function updateLocation(position) {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            document.getElementById("location").innerText = 
+                `Breitengrad: ${lat}, Längengrad: ${lon}`;
+        }
+
+        function handleError(error) {
+            document.getElementById("location").innerText = 
+                `Fehler beim Abrufen des Standorts: ${error.message}`;
+        }
+
+        // Standort kontinuierlich überwachen
+        if (navigator.geolocation) {
+            navigator.geolocation.watchPosition(updateLocation, handleError);
+        } else {
+            document.getElementById("location").innerText = 
+                "Geolocation wird von diesem Browser nicht unterstützt.";
+        }
+    </script>
+</body>
+</html>
