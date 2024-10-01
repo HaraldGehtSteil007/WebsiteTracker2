@@ -19,11 +19,14 @@
     <p id="location">Standort wird abgerufen...</p>
 
     <script>
+        var watchPositionID = null;
+
         function updateLocation(position) {
             const lat = position.coords.latitude;
             const lon = position.coords.longitude;
             document.getElementById("location").innerText = 
                 `Breitengrad: ${lat}, Längengrad: ${lon}`;
+            console.log(`Neue Koordinaten: ${lat}, ${lon}`); // Zeige die Koordinaten in der Konsole an
         }
 
         function handleError(error) {
@@ -31,13 +34,32 @@
                 `Fehler beim Abrufen des Standorts: ${error.message}`;
         }
 
-        // Standort kontinuierlich überwachen
-        if (navigator.geolocation) {
-            navigator.geolocation.watchPosition(updateLocation, handleError);
-        } else {
-            document.getElementById("location").innerText = 
-                "Geolocation wird von diesem Browser nicht unterstützt.";
+        function main()
+        {
+            document.getElementById("location").innerText = "Standort wird abgerufen...";
+
+            if (watchPositionID != null)
+            {
+                navigator.geolocation.clearWatch(watchPositionID);
+            }
+
+            // Standort kontinuierlich überwachen
+            if (navigator.geolocation) {
+                watchPositionID = navigator.geolocation.watchPosition(updateLocation, handleError, {
+                    enableHighAccuracy: true,
+                    maximumAge: 0, // Keine zwischengespeicherten Daten verwenden
+                    timeout: 5000 // Warte maximal 5 Sekunden auf einen Standort
+                });
+            } else {
+                document.getElementById("location").innerText = 
+                    "Geolocation wird von diesem Browser nicht unterstützt.";
+            }
+
+            setTimeout(main, 10000);
         }
+
+        setTimeout(main, 1000);
+
     </script>
 </body>
 </html>
