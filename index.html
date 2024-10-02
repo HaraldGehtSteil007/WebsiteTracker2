@@ -15,26 +15,40 @@
         #image {
             display: none;
             margin-top: 20px;
+            width: 200px; /* Größe des Bildes anpassen */
         }
     </style>
 </head>
 <body>
     <h1>Standort Abfrage</h1>
     <p id="location">Standort wird abgerufen...</p>
-    <img id="image" src="rakete.png" alt="Bild" />
+    <img id="image" src="" alt="Bild" />
 
     <script>
         var watchPositionID = null;
 
-        // Vorher festgelegte Referenzkoordinaten
-        const referenceLat = 52.4908; // Beispielkoordinaten für Breitengrad
-        const referenceLon = 13.6246; // Beispielkoordinaten für Längengrad
+        // Array von Koordinaten und den dazugehörigen Bildern
+        const locations = [
+            { lat: 52.4908, lon: 13.6245, image: 'albert.png' },  // Beispiel Albert
+            { lat: 52.4897, lon: 16.6243, image: 'treffpunkt.png' },    // Beispiel Treffpunkt
+            { lat: 52.4766, lon: 13.6348, image: 'huette.png' } // Beispiel Huette
+        ];
 
         // Funktion zur Berechnung der Differenz und Vergleich der Koordinaten
-        function isWithinRange(lat, lon) {
-            const latDiff = Math.abs(lat - referenceLat);
-            const lonDiff = Math.abs(lon - referenceLon);
+        function isWithinRange(lat, lon, targetLat, targetLon) {
+            const latDiff = Math.abs(lat - targetLat);
+            const lonDiff = Math.abs(lon - targetLon);
             return latDiff <= 0.0002 && lonDiff <= 0.0002;
+        }
+
+        // Funktion, um das passende Bild für den aktuellen Standort zu finden
+        function findLocation(lat, lon) {
+            for (let i = 0; i < locations.length; i++) {
+                if (isWithinRange(lat, lon, locations[i].lat, locations[i].lon)) {
+                    return locations[i].image; // Rückgabe des Bildes für die Übereinstimmung
+                }
+            }
+            return null; // Keine Übereinstimmung gefunden
         }
 
         function updateLocation(position) {
@@ -44,11 +58,14 @@
                 `Breitengrad: ${lat}, Längengrad: ${lon}`;
             console.log(`Neue Koordinaten: ${lat}, ${lon}`); // Zeige die Koordinaten in der Konsole an
             
-            // Überprüfe, ob die Koordinaten im Bereich sind
-            if (isWithinRange(lat, lon)) {
+            // Finde das passende Bild
+            const image = findLocation(lat, lon);
+            
+            if (image) {
+                document.getElementById("image").src = image; // Bild setzen
                 document.getElementById("image").style.display = "block"; // Bild anzeigen
             } else {
-                document.getElementById("image").style.display = "none"; // Bild verstecken
+                document.getElementById("image").style.display = "none"; // Kein Bild anzeigen
             }
         }
 
