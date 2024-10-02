@@ -12,14 +12,30 @@
         #location {
             margin-top: 20px;
         }
+        #image {
+            display: none;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
     <h1>Standort Abfrage</h1>
     <p id="location">Standort wird abgerufen...</p>
+    <img id="image" src="rakete.png" alt="Bild" />
 
     <script>
         var watchPositionID = null;
+
+        // Vorher festgelegte Referenzkoordinaten
+        const referenceLat = 52.4908; // Beispielkoordinaten für Breitengrad
+        const referenceLon = 13.6246; // Beispielkoordinaten für Längengrad
+
+        // Funktion zur Berechnung der Differenz und Vergleich der Koordinaten
+        function isWithinRange(lat, lon) {
+            const latDiff = Math.abs(lat - referenceLat);
+            const lonDiff = Math.abs(lon - referenceLon);
+            return latDiff <= 0.0002 && lonDiff <= 0.0002;
+        }
 
         function updateLocation(position) {
             const lat = position.coords.latitude;
@@ -27,6 +43,13 @@
             document.getElementById("location").innerText = 
                 `Breitengrad: ${lat}, Längengrad: ${lon}`;
             console.log(`Neue Koordinaten: ${lat}, ${lon}`); // Zeige die Koordinaten in der Konsole an
+            
+            // Überprüfe, ob die Koordinaten im Bereich sind
+            if (isWithinRange(lat, lon)) {
+                document.getElementById("image").style.display = "block"; // Bild anzeigen
+            } else {
+                document.getElementById("image").style.display = "none"; // Bild verstecken
+            }
         }
 
         function handleError(error) {
@@ -34,12 +57,10 @@
                 `Fehler beim Abrufen des Standorts: ${error.message}`;
         }
 
-        function main()
-        {
+        function main() {
             document.getElementById("location").innerText = "Standort wird abgerufen...";
 
-            if (watchPositionID != null)
-            {
+            if (watchPositionID != null) {
                 navigator.geolocation.clearWatch(watchPositionID);
             }
 
@@ -59,7 +80,6 @@
         }
 
         setTimeout(main, 1000);
-
     </script>
 </body>
 </html>
