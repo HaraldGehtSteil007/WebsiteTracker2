@@ -17,6 +17,10 @@
             margin-top: 20px;
             width: 200px; /* Größe des Bildes anpassen */
         }
+        #name, #description {
+            margin-top: 10px;
+            font-weight: bold;
+        }
         .querbalken {
             width: 100%; /* volle Breite */
             height: 50px; /* Höhe des Balkens */
@@ -27,7 +31,7 @@
 </head>
 <body>
     <div style="width:100%;max-width:1200;margin:0 auto; box-shadow: -2px 0px 4px grey, 2px 0px 4px grey;">
-    <div class="querbalken"></div>
+        <div class="querbalken"></div>
         <p id="location">Standort wird abgerufen...</p>
         <img id="image" src="" alt="Bild" />
         <p id="name"></p>
@@ -36,11 +40,11 @@
         <script>
             var watchPositionID = null;
 
-            // Array von Koordinaten und den dazugehörigen Bildern
+            // Array von Koordinaten mit zusätzlichen Informationen
             const locations = [
                 {
                     lat: 52.4908,
-                    lon: 13.6245,
+                    lon: 13.6246,
                     image: 'albert.png',
                     name: 'Albert',
                     description: 'Ein schöner Treffpunkt nahe dem Park'
@@ -61,7 +65,6 @@
                 }
             ];
 
-
             // Funktion zur Berechnung der Differenz und Vergleich der Koordinaten
             function isWithinRange(lat, lon, targetLat, targetLon) {
                 const latDiff = Math.abs(lat - targetLat);
@@ -69,11 +72,11 @@
                 return latDiff <= 0.0002 && lonDiff <= 0.0002;
             }
 
-            // Funktion, um das passende Bild für den aktuellen Standort zu finden
+            // Funktion, um das passende Bild und die zusätzlichen Infos für den aktuellen Standort zu finden
             function findLocation(lat, lon) {
                 for (let i = 0; i < locations.length; i++) {
                     if (isWithinRange(lat, lon, locations[i].lat, locations[i].lon)) {
-                        return locations[i].image; // Rückgabe des Bildes für die Übereinstimmung
+                        return locations[i]; // Rückgabe des ganzen Objekts bei Übereinstimmung
                     }
                 }
                 return null; // Keine Übereinstimmung gefunden
@@ -84,20 +87,19 @@
                 const lon = position.coords.longitude;
                 document.getElementById("location").innerText = 
                     `Breitengrad: ${lat}, Längengrad: ${lon}`;
-                console.log(`Neue Koordinaten: ${lat}, ${lon}`); // Zeige die Koordinaten in der Konsole an
-            
-                // Finde das passende Bild
+
+                // Finde die passenden Informationen zum Standort
                 const location = findLocation(lat, lon);
 
                 if (location) {
-                    document.getElementById("image").src = location.image;
-                    document.getElementById("image").style.display = "block";
-                    document.getElementById("name").innerText = `Name: ${location.name}`;
-                    document.getElementById("description").innerText = `Beschreibung: ${location.description}`;
+                    document.getElementById("image").src = location.image; // Bild setzen
+                    document.getElementById("image").style.display = "block"; // Bild anzeigen
+                    document.getElementById("name").innerText = `Name: ${location.name}`; // Name anzeigen
+                    document.getElementById("description").innerText = `Beschreibung: ${location.description}`; // Beschreibung anzeigen
                 } else {
-                    document.getElementById("image").style.display = "none";
-                    document.getElementById("name").innerText = '';
-                    document.getElementById("description").innerText = '';
+                    document.getElementById("image").style.display = "none"; // Bild ausblenden
+                    document.getElementById("name").innerText = ''; // Name zurücksetzen
+                    document.getElementById("description").innerText = ''; // Beschreibung zurücksetzen
                 }
             }
 
@@ -125,7 +127,7 @@
                         "Geolocation wird von diesem Browser nicht unterstützt.";
                 }
 
-                setTimeout(main, 10000);
+                setTimeout(main, 10000); // Aktualisiere die Standortabfrage alle 10 Sekunden
             }
 
             setTimeout(main, 1000);
