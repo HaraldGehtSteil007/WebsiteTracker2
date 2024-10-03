@@ -47,21 +47,21 @@
                     lon: 13.6246,
                     image: 'albert.png',
                     name: 'Albert',
-                    description: 'Ein schöner Treffpunkt nahe dem Park'
+                    description: 'Alberts Zuhause bei meinen Koordinaten'
                 },
                 {
-                    lat: 52.4897,
-                    lon: 13.6243,
-                    image: 'treffpunkt.png',
-                    name: 'Treffpunkt',
-                    description: 'Der beliebte Treffpunkt im Zentrum'
+                    lat: 52.4521,
+                    lon: 13.6332,
+                    image: 'ghsnord.jpg',
+                    name: 'Nördlicher Teil vom GHS',
+                    description: 'Der eissige Norden des Gerhauptmanischen Imperiums.'
                 },
                 {
-                    lat: 52.4766,
-                    lon: 13.6348,
-                    image: 'huette.png',
-                    name: 'Hütte',
-                    description: 'Eine gemütliche Hütte im Wald'
+                    lat: 52.4516,
+                    lon: 13.6332,
+                    image: 'ghssued.png',
+                    name: 'Südlicher Teil vom GHS',
+                    description: 'Der warme Süden des Gerhauptmanischen Imperiums.'
                 }
             ];
 
@@ -85,8 +85,8 @@
             function updateLocation(position) {
                 const lat = position.coords.latitude;
                 const lon = position.coords.longitude;
-                //document.getElementById("location").innerText = 
-                //    `Breitengrad: ${lat}, Längengrad: ${lon}`;
+                document.getElementById("location").innerText = 
+                    `Breitengrad: ${lat}, Längengrad: ${lon}`;
 
                 // Finde die passenden Informationen zum Standort
                 const location = findLocation(lat, lon);
