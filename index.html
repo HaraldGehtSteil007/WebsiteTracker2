@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Standort Abfrage</title>
+    <title>Digitaler Reiseführer</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -17,86 +17,118 @@
             margin-top: 20px;
             width: 200px; /* Größe des Bildes anpassen */
         }
+        .querbalken {
+            width: 100%; /* volle Breite */
+            height: 50px; /* Höhe des Balkens */
+            background-color: #50afce; /* hellblaue Farbe */
+            margin: 0px 0; /* Abstand nach oben und unten */
+        }
     </style>
 </head>
 <body>
-    <h1>Standort Abfrage</h1>
-    <p id="location">Standort wird abgerufen...</p>
-    <img id="image" src="" alt="Bild" />
+    <div style="width:100%;max-width:1200;margin:0 auto; box-shadow: -2px 0px 4px grey, 2px 0px 4px grey;">
+    <div class="querbalken"></div>
+        <p id="location">Standort wird abgerufen...</p>
+        <img id="image" src="" alt="Bild" />
 
-    <script>
-        var watchPositionID = null;
 
-        // Array von Koordinaten und den dazugehörigen Bildern
-        const locations = [
-            { lat: 52.4936, lon: 13.6192, image: 'albert.png' },  // Beispiel Albert
-            { lat: 52.4897, lon: 13.6243, image: 'treffpunkt.png' },  // Beispiel Treffpunkt
-            { lat: 52.4766, lon: 13.6348, image: 'huette.png' }  // Beispiel Huette
-        ];
+        <script>
+            var watchPositionID = null;
 
-        // Funktion zur Berechnung der Differenz und Vergleich der Koordinaten
-        function isWithinRange(lat, lon, targetLat, targetLon) {
-            const latDiff = Math.abs(lat - targetLat);
-            const lonDiff = Math.abs(lon - targetLon);
-            return latDiff <= 0.0002 && lonDiff <= 0.0002;
-        }
+            // Array von Koordinaten und den dazugehörigen Bildern
+            const locations = [
+                {
+                    lat: 52.4908,
+                    lon: 13.6245,
+                    image: 'albert.png',
+                    name: 'Albert',
+                    description: 'Ein schöner Treffpunkt nahe dem Park'
+                },
+                {
+                    lat: 52.4897,
+                    lon: 13.6243,
+                    image: 'treffpunkt.png',
+                    name: 'Treffpunkt',
+                    description: 'Der beliebte Treffpunkt im Zentrum'
+                },
+                {
+                    lat: 52.4766,
+                    lon: 13.6348,
+                    image: 'huette.png',
+                    name: 'Hütte',
+                    description: 'Eine gemütliche Hütte im Wald'
+                }
+            ];
 
-        // Funktion, um das passende Bild für den aktuellen Standort zu finden
-        function findLocation(lat, lon) {
-            for (let i = 0; i < locations.length; i++) {
-                if (isWithinRange(lat, lon, locations[i].lat, locations[i].lon)) {
-                    return locations[i].image; // Rückgabe des Bildes für die Übereinstimmung
+
+            // Funktion zur Berechnung der Differenz und Vergleich der Koordinaten
+            function isWithinRange(lat, lon, targetLat, targetLon) {
+                const latDiff = Math.abs(lat - targetLat);
+                const lonDiff = Math.abs(lon - targetLon);
+                return latDiff <= 0.0002 && lonDiff <= 0.0002;
+            }
+
+            // Funktion, um das passende Bild für den aktuellen Standort zu finden
+            function findLocation(lat, lon) {
+                for (let i = 0; i < locations.length; i++) {
+                    if (isWithinRange(lat, lon, locations[i].lat, locations[i].lon)) {
+                        return locations[i].image; // Rückgabe des Bildes für die Übereinstimmung
+                    }
+                }
+                return null; // Keine Übereinstimmung gefunden
+            }
+
+            function updateLocation(position) {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+                document.getElementById("location").innerText = 
+                    `Breitengrad: ${lat}, Längengrad: ${lon}`;
+                console.log(`Neue Koordinaten: ${lat}, ${lon}`); // Zeige die Koordinaten in der Konsole an
+            
+                // Finde das passende Bild
+                const location = findLocation(lat, lon);
+
+                if (location) {
+                    document.getElementById("image").src = location.image;
+                    document.getElementById("image").style.display = "block";
+                    document.getElementById("name").innerText = `Name: ${location.name}`;
+                    document.getElementById("description").innerText = `Beschreibung: ${location.description}`;
+                } else {
+                    document.getElementById("image").style.display = "none";
+                    document.getElementById("name").innerText = '';
+                    document.getElementById("description").innerText = '';
                 }
             }
-            return null; // Keine Übereinstimmung gefunden
-        }
 
-        function updateLocation(position) {
-            const lat = position.coords.latitude;
-            const lon = position.coords.longitude;
-            document.getElementById("location").innerText = 
-                `Breitengrad: ${lat}, Längengrad: ${lon}`;
-            console.log(`Neue Koordinaten: ${lat}, ${lon}`); // Zeige die Koordinaten in der Konsole an
-            
-            // Finde das passende Bild
-            const image = findLocation(lat, lon);
-            
-            if (image) {
-                document.getElementById("image").src = image; // Bild setzen
-                document.getElementById("image").style.display = "block"; // Bild anzeigen
-            } else {
-                document.getElementById("image").style.display = "none"; // Kein Bild anzeigen
-            }
-        }
-
-        function handleError(error) {
-            document.getElementById("location").innerText = 
-                `Fehler beim Abrufen des Standorts: ${error.message}`;
-        }
-
-        function main() {
-            document.getElementById("location").innerText = "Standort wird abgerufen...";
-
-            if (watchPositionID != null) {
-                navigator.geolocation.clearWatch(watchPositionID);
-            }
-
-            // Standort kontinuierlich überwachen
-            if (navigator.geolocation) {
-                watchPositionID = navigator.geolocation.watchPosition(updateLocation, handleError, {
-                    enableHighAccuracy: true,
-                    maximumAge: 0, // Keine zwischengespeicherten Daten verwenden
-                    timeout: 5000 // Warte maximal 5 Sekunden auf einen Standort
-                });
-            } else {
+            function handleError(error) {
                 document.getElementById("location").innerText = 
-                    "Geolocation wird von diesem Browser nicht unterstützt.";
+                    `Fehler beim Abrufen des Standorts: ${error.message}`;
             }
 
-            setTimeout(main, 10000);
-        }
+            function main() {
+                document.getElementById("location").innerText = "Standort wird abgerufen...";
 
-        setTimeout(main, 1000);
-    </script>
+                if (watchPositionID != null) {
+                    navigator.geolocation.clearWatch(watchPositionID);
+                }
+
+                // Standort kontinuierlich überwachen
+                if (navigator.geolocation) {
+                    watchPositionID = navigator.geolocation.watchPosition(updateLocation, handleError, {
+                        enableHighAccuracy: true,
+                        maximumAge: 0, // Keine zwischengespeicherten Daten verwenden
+                        timeout: 5000 // Warte maximal 5 Sekunden auf einen Standort
+                    });
+                } else {
+                    document.getElementById("location").innerText = 
+                        "Geolocation wird von diesem Browser nicht unterstützt.";
+                }
+
+                setTimeout(main, 10000);
+            }
+
+            setTimeout(main, 1000);
+        </script>
+    </div>
 </body>
 </html>
